@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nubbie</title>
+<style>
+  :root{
+    --bg:#f5f5f7;
+    --card:#ffffff;
+    --bot:#e5e5ea;
+    --me:#d6e4ff;
+    --ink:#111;
+    --line:#e0e0e0;
+    --accent:#0a84ff;
+  }
+  html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;color:var(--ink);background:var(--bg)}
+  .app{display:flex;flex-direction:column;height:100%;max-width:820px;margin:0 auto;position:relative}
+  .promptbar{
+    display:flex;align-items:center;gap:10px;
+    padding:10px 12px;margin:10px 16px;
+    background:var(--card); border:1px solid var(--line);
+    border-radius:999px; box-shadow:0 1px 2px rgba(0,0,0,.03);
+  }
+  .promptbar input{
+    flex:1; border:0; outline:0; font-size:16px; background:transparent;
+    padding:8px 10px;
+  }
+  .sendbtn{
+    width:40px;height:40px;border-radius:50%;
+    border:0; background:var(--accent); color:#fff; font-size:18px;
+    display:flex;align-items:center;justify-content:center; cursor:pointer;
+  }
+  .chat{flex:1;overflow:auto;padding:8px 14px 0 14px}
+  .row{display:flex;margin:8px 0}
+  .bubble{padding:10px 12px;border-radius:16px;max-width:78%;line-height:1.35;white-space:pre-wrap;word-wrap:break-word}
+  .me{justify-content:flex-end}
+  .me .bubble{background:var(--me)}
+  .bot .bubble{background:var(--bot)}
+  .bottomPad{height:16px}
+
+  /* Pencil button */
+  .newchat-btn{
+    position:absolute;top:10px;right:12px;
+    background:var(--accent);color:#fff;
+    border:none;border-radius:50%;width:36px;height:36px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:18px;cursor:pointer;box-shadow:0 2px 4px rgba(0,0,0,0.2);
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <!-- Pencil button -->
+  <button id="newchat" class="newchat-btn" aria-label="New Chat">✏️</button>
+
+  <div id="chat" class="chat"></div>
+  <div class="promptbar">
+    <input id="prompt" type="text" placeholder="Type your request here…" autocomplete="off">
+    <button id="send" class="sendbtn" aria-label="Send">➤</button>
+  </div>
+  <div class="bottomPad"></div>
+</div>
+
+<script>
+const chat   = document.getElementById('chat');
+const prompt = document.getElementById('prompt');
+const send   = document.getElementById('send');
+const newBtn = document.getElementById('newchat');
+
+const unhelpful = [
+  "Sorry, I don’t understand.",
+  "Do it yourself.",
+  "I don’t know.",
+  "Error.",
+  "No clue.",
+  "Ask someone else.",
+  "Processing… just kidding.",
+  "That sounds like a you problem."
+];
+
+function addMsg(text, fromUser){
+  const row = document.createElement('div');
+  row.className = 'row ' + (fromUser ? 'me' : 'bot');
+  const bub = document.createElement('div');
+  bub.className = 'bubble';
+  bub.textContent = text;
+  row.appendChild(bub);
+  chat.appendChild(row);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function rand(arr){ return arr[Math.floor(Math.random()*arr.length)] }
+
+function nubbieReply(){
+  const reply = rand(unhelpful);
+  setTimeout(()=> addMsg(reply,false), 450);
+}
+
+function handleSend(){
+  const t = prompt.value.trim();
+  if(!t) return;
+  addMsg(t,true);
+  prompt.value = '';
+  nubbieReply();
+}
+
+function newChat(){
+  chat.innerHTML = ''; // clear chat
+  addMsg("yo. How can I be unhelpful? 🤓", false); // reset greeting
+}
+
+send.addEventListener('click', handleSend);
+prompt.addEventListener('keydown', e => { if(e.key === 'Enter') handleSend() });
+newBtn.addEventListener('click', newChat);
+
+// Initial greeting
+addMsg("yo. How can I be unhelpful? 🤓", false);
+</script>
+</body>
+</html>
